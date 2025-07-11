@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCountdown } from "@/hooks/useCountdown";
@@ -13,14 +13,14 @@ interface Response {
   timestamp: number;
 }
 
-export default function SessionPage() {
+function SessionPageContent() {
   const [userInput, setUserInput] = useState("");
   const [currentPair, setCurrentPair] = useState<{theme: string, word: string}>({theme: "読み込み中", word: "..."});
   const [pairCount, setPairCount] = useState(0);
   const [responses, setResponses] = useState<Response[]>([]);
   const [sessionMinutes, setSessionMinutes] = useState(5);
   const [sessionSeconds, setSessionSeconds] = useState(300);
-  const { timeLeft, isFinished, start, formatTime } = useCountdown(sessionSeconds);
+  const { isFinished, start, formatTime } = useCountdown(sessionSeconds);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -202,5 +202,15 @@ export default function SessionPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SessionPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-orange-50 to-orange-100">
+      <div className="text-lg text-gray-700">読み込み中...</div>
+    </div>}>
+      <SessionPageContent />
+    </Suspense>
   );
 }
