@@ -80,13 +80,28 @@ export default function ResultPage() {
     if (!captureRef.current) return;
     
     setIsCapturing(true);
+    let originalStyle = '';
+    
     try {
+      // 一時的にスタイルを変更してoklch色を回避
+      originalStyle = captureRef.current.style.cssText;
+      captureRef.current.style.cssText = `
+        ${originalStyle}
+        background: linear-gradient(to bottom, #fff7ed, #fed7aa) !important;
+        color: #000000 !important;
+      `;
+      
       const canvas = await html2canvas(captureRef.current, {
         backgroundColor: '#ffffff',
         scale: 2,
         useCORS: true,
         allowTaint: true,
+        logging: false,
+        foreignObjectRendering: true,
       });
+      
+      // 元のスタイルに戻す
+      captureRef.current.style.cssText = originalStyle;
       
       // canvasをBlob形式に変換
       canvas.toBlob((blob) => {
@@ -103,6 +118,10 @@ export default function ResultPage() {
       }, 'image/png');
     } catch (error) {
       console.error('PNG出力に失敗しました:', error);
+      // エラーが発生した場合も元のスタイルに戻す
+      if (captureRef.current && originalStyle) {
+        captureRef.current.style.cssText = originalStyle;
+      }
     } finally {
       setIsCapturing(false);
     }
