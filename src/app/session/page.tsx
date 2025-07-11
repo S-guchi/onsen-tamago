@@ -16,9 +16,8 @@ export default function SessionPage() {
   const [userInput, setUserInput] = useState("");
   const [currentPair, setCurrentPair] = useState<[string, string]>(["読み込み中", "..."]);
   const [pairCount, setPairCount] = useState(0);
-  const [autoAdvance, setAutoAdvance] = useState(false);
   const [responses, setResponses] = useState<Response[]>([]);
-  const { timeLeft, isActive, isFinished, start, formatTime } = useCountdown(300);
+  const { timeLeft, isFinished, start, formatTime } = useCountdown(300);
   const router = useRouter();
 
   // 次の単語ペアを生成
@@ -49,16 +48,6 @@ export default function SessionPage() {
     }
   }, [isFinished, router, responses]);
 
-  // 自動進行タイマーを無効化（手動のみ）
-  // useEffect(() => {
-  //   if (isActive && autoAdvance) {
-  //     const interval = setInterval(() => {
-  //       generateNextPair();
-  //     }, 1500); // 1.5秒間隔
-
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [isActive, autoAdvance]);
 
   // レスポンス配列の変更をコンソールで確認
   useEffect(() => {
