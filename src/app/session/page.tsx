@@ -146,7 +146,13 @@ export default function SessionPage() {
                   <textarea
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    placeholder="アイデアを入力..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmit(e);
+                      }
+                    }}
+                    placeholder="アイデアを入力... (Enter で送信、Shift+Enter で改行)"
                     className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg"
                     autoFocus
                   />
@@ -178,6 +184,17 @@ export default function SessionPage() {
             ペア数: {pairCount} / 150+ 予定 | 回答数: {responses.length}
           </div>
         </div>
+
+        {/* 開発用: 最新の回答を表示 */}
+        {responses.length > 0 && (
+          <div className="mt-4 bg-white/50 rounded-lg p-4 max-w-md mx-auto">
+            <h3 className="text-sm font-bold text-gray-700 mb-2">最新の回答:</h3>
+            <div className="text-xs text-gray-600">
+              <div>「{responses[responses.length - 1].wordPair[0]} × {responses[responses.length - 1].wordPair[1]}」</div>
+              <div className="mt-1 font-semibold">→ {responses[responses.length - 1].userInput}</div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
