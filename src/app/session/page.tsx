@@ -10,6 +10,7 @@ export default function SessionPage() {
   const [userInput, setUserInput] = useState("");
   const [currentPair, setCurrentPair] = useState<[string, string]>(["読み込み中", "..."]);
   const [pairCount, setPairCount] = useState(0);
+  const [autoAdvance, setAutoAdvance] = useState(true);
   const { timeLeft, isActive, isFinished, start, formatTime } = useCountdown(300);
   const router = useRouter();
 
@@ -19,6 +20,9 @@ export default function SessionPage() {
     if (pair) {
       setCurrentPair([pair.word1, pair.word2]);
       setPairCount(wordPairGenerator.getUsedPairsCount());
+      // 自動進行を一時停止して、ユーザーがペアを見る時間を作る
+      setAutoAdvance(false);
+      setTimeout(() => setAutoAdvance(true), 1000);
     }
   };
 
@@ -39,17 +43,30 @@ export default function SessionPage() {
     }
   }, [isFinished, router]);
 
+  // 自動進行タイマー（1-2秒間隔でペアを切り替え）
+  useEffect(() => {
+    if (isActive && autoAdvance) {
+      const interval = setInterval(() => {
+        generateNextPair();
+      }, 1500); // 1.5秒間隔
+
+      return () => clearInterval(interval);
+    }
+  }, [isActive, autoAdvance]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (userInput.trim()) {
       console.log("入力:", userInput);
       setUserInput("");
+      // 手動で送信した場合は即座に次のペアを表示
       generateNextPair();
     }
   };
 
   const handleSkip = () => {
     console.log("スキップ");
+    // 手動でスキップした場合は即座に次のペアを表示
     generateNextPair();
   };
 
