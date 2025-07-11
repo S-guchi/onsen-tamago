@@ -4,12 +4,28 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCountdown } from "@/hooks/useCountdown";
+import { wordPairGenerator } from "@/utils/wordPair";
 
 export default function SessionPage() {
   const [userInput, setUserInput] = useState("");
-  const [currentPair, setCurrentPair] = useState(["単語1", "単語2"]);
+  const [currentPair, setCurrentPair] = useState<[string, string]>(["読み込み中", "..."]);
+  const [pairCount, setPairCount] = useState(0);
   const { timeLeft, isActive, isFinished, start, formatTime } = useCountdown(300);
   const router = useRouter();
+
+  // 次の単語ペアを生成
+  const generateNextPair = () => {
+    const pair = wordPairGenerator.getRandomPair();
+    if (pair) {
+      setCurrentPair([pair.word1, pair.word2]);
+      setPairCount(wordPairGenerator.getUsedPairsCount());
+    }
+  };
+
+  // 初回ロード時に最初のペアを生成
+  useEffect(() => {
+    generateNextPair();
+  }, []);
 
   // セッション開始時に自動でタイマーを開始
   useEffect(() => {
@@ -28,13 +44,13 @@ export default function SessionPage() {
     if (userInput.trim()) {
       console.log("入力:", userInput);
       setUserInput("");
-      // TODO: 次の単語ペアを生成
+      generateNextPair();
     }
   };
 
   const handleSkip = () => {
-    // TODO: 次の単語ペアを生成
     console.log("スキップ");
+    generateNextPair();
   };
 
   return (
@@ -122,7 +138,7 @@ export default function SessionPage() {
         {/* 進捗インジケーター */}
         <div className="mt-8 text-center text-gray-600">
           <div className="text-sm">
-            ペア数: 1 / 150+ 予定
+            ペア数: {pairCount} / 150+ 予定
           </div>
         </div>
       </div>
