@@ -152,12 +152,12 @@ export default function SessionPage() {
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
+                      if (e.key === 'Enter' && e.shiftKey) {
                         e.preventDefault();
                         handleSubmit(e);
                       }
                     }}
-                    placeholder="アイデアを入力... (Enter で送信、Shift+Enter で改行)"
+                    placeholder="アイデアを入力... (Shift+Enter で送信、Enter で改行)"
                     className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg"
                     autoFocus
                   />
@@ -168,7 +168,7 @@ export default function SessionPage() {
                     type="submit"
                     className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
                   >
-                    送信 (Enter)
+                    送信 (Shift+Enter)
                   </button>
                   <button
                     type="button"
