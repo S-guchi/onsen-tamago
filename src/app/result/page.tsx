@@ -14,6 +14,7 @@ export default function ResultPage() {
   const [responses, setResponses] = useState<Response[]>([]);
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [copySuccess, setCopySuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +36,29 @@ export default function ResultPage() {
     // sessionStorageをクリア
     sessionStorage.removeItem('brainstormResults');
     router.push("/");
+  };
+
+  const handleCopyMarkdown = async () => {
+    try {
+      await navigator.clipboard.writeText(markdown);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000); // 2秒後にリセット
+    } catch (error) {
+      console.error('コピーに失敗しました:', error);
+      // フォールバック: テキストエリアを使用
+      const textArea = document.createElement('textarea');
+      textArea.value = markdown;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      } catch (fallbackError) {
+        console.error('フォールバックコピーも失敗しました:', fallbackError);
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   if (isLoading) {
@@ -96,10 +120,10 @@ export default function ResultPage() {
           </div>
           <div className="flex gap-4">
             <button
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
-              onClick={() => {/* TODO: コピー機能 */}}
+              className={`${copySuccess ? 'bg-green-500' : 'bg-orange-500 hover:bg-orange-600'} text-white font-bold py-2 px-4 rounded transition-colors duration-200`}
+              onClick={handleCopyMarkdown}
             >
-              📋 Markdownをコピー
+              {copySuccess ? '✅ コピー完了！' : '📋 Markdownをコピー'}
             </button>
             <button
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
