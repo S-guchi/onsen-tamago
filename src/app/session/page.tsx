@@ -46,9 +46,11 @@ export default function SessionPage() {
   // タイマー完了時にresultページに遷移
   useEffect(() => {
     if (isFinished) {
+      // セッション結果をsessionStorageに保存
+      sessionStorage.setItem('brainstormResults', JSON.stringify(responses));
       router.push("/result");
     }
-  }, [isFinished, router]);
+  }, [isFinished, router, responses]);
 
   // 自動進行タイマー（1-2秒間隔でペアを切り替え）
   useEffect(() => {
