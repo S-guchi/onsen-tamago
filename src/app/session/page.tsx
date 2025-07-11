@@ -6,11 +6,18 @@ import { useRouter } from "next/navigation";
 import { useCountdown } from "@/hooks/useCountdown";
 import { wordPairGenerator } from "@/utils/wordPair";
 
+interface Response {
+  wordPair: [string, string];
+  userInput: string;
+  timestamp: number;
+}
+
 export default function SessionPage() {
   const [userInput, setUserInput] = useState("");
   const [currentPair, setCurrentPair] = useState<[string, string]>(["読み込み中", "..."]);
   const [pairCount, setPairCount] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
+  const [responses, setResponses] = useState<Response[]>([]);
   const { timeLeft, isActive, isFinished, start, formatTime } = useCountdown(300);
   const router = useRouter();
 
@@ -54,10 +61,23 @@ export default function SessionPage() {
     }
   }, [isActive, autoAdvance]);
 
+  // レスポンス配列の変更をコンソールで確認
+  useEffect(() => {
+    console.log("現在のresponses:", responses);
+  }, [responses]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (userInput.trim()) {
-      console.log("入力:", userInput);
+      // レスポンスを保存
+      const newResponse: Response = {
+        wordPair: currentPair,
+        userInput: userInput.trim(),
+        timestamp: Date.now()
+      };
+      setResponses(prev => [...prev, newResponse]);
+      
+      console.log("入力:", userInput, "ペア:", currentPair);
       setUserInput("");
       // 手動で送信した場合は即座に次のペアを表示
       generateNextPair();
@@ -155,7 +175,7 @@ export default function SessionPage() {
         {/* 進捗インジケーター */}
         <div className="mt-8 text-center text-gray-600">
           <div className="text-sm">
-            ペア数: {pairCount} / 150+ 予定
+            ペア数: {pairCount} / 150+ 予定 | 回答数: {responses.length}
           </div>
         </div>
       </div>
