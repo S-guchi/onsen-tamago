@@ -1,6 +1,6 @@
 # 温泉卵ブレスト
 
-> 温泉卵キャラが 5 分間ノンストップで **強制連想法** を仕掛けるブレインストーミングツール。アイデアを一気に吐き出し、Markdown もしくは PNG で即エクスポートできます。
+> 温泉卵キャラが **テーマ×単語** の強制連想法でアイデア発想をサポートするブレインストーミングツール。1分・3分・5分から選べる時間モードで、Markdown 形式で結果をエクスポートできます。
 
 ## 温泉卵の画像
 
@@ -10,12 +10,11 @@ public/onsen-tamago.png
 
 ## ✨ 主な機能
 
-* **ワンクリックでスタート** ─ 5 分カウントダウンが開始
-* **単語ペア** を表示、次へ or スキップ or 入力後送信で次の単語へ（ローカル `words.json` からランダム生成）
-* **キーボード中心の入力体験** ─ Enter で送信、Skip ボタンでパス
+* **時間モード選択** ─ 1分・3分・5分から選択可能
+* **テーマ×単語ペア** を表示、101テーマ × 354単語 = 35,754通りの組み合わせ
+* **キーボード中心の入力体験** ─ Shift+Enter で送信、Enter で改行、Skip ボタンでパス
 * **タイムアップで自動遷移** → 結果画面に一覧表示
-* **Markdown テーブルをワンクリックコピー**
-* **html2canvas で PNG ダウンロード** & SNS シェア
+* **Markdown テーブルをワンクリックコピー** ─ 統計情報付き
 * **完全フロントエンド** ─ DB 不要、静的ホスティング可
 
 ---
@@ -24,12 +23,11 @@ public/onsen-tamago.png
 
 | レイヤー        | 使用技術                             |
 | ----------- | -------------------------------- |
-| UI & ルーティング | **Next.js (React + TypeScript)** |
-| 状態管理        | Zustand                          |
-| スタイリング      | CSS Modules (Tailwind 併用可)       |
-| 補助ライブラリ     | html2canvas / dayjs              |
-| テスト         | Jest (ユニット) + Playwright (E2E)   |
-| CI/CD       | GitHub Actions → Vercel          |
+| UI & ルーティング | **Next.js 15.3.5 (React + TypeScript)** |
+| 状態管理        | React Hooks (useState, useEffect)  |
+| スタイリング      | Tailwind CSS v4                 |
+| テスト         | Jest (ユニット)                    |
+| 型チェック       | TypeScript (strict mode)         |
 
 ---
 
@@ -37,8 +35,8 @@ public/onsen-tamago.png
 
 ```bash
 # 1. リポジトリをクローン
-git clone https://github.com/your-name/onsen-egg-brainstorm.git
-cd onsen-egg-brainstorm
+git clone https://github.com/your-name/onsen-tamago.git
+cd onsen-tamago
 
 # 2. 依存関係をインストール
 npm install  # Node.js v18 以上推奨
@@ -54,8 +52,8 @@ npm run dev  # http://localhost:3000
 | `dev`   | 開発サーバー (HMR 対応)                |
 | `build` | 本番ビルド (`.next/` 生成)            |
 | `start` | ローカルで本番サーバー起動                  |
-| `lint`  | ESLint + Prettier チェック         |
-| `test`  | Jest (ユニット) + Playwright (E2E) |
+| `lint`  | ESLint チェック                   |
+| `test`  | Jest (ユニット)                   |
 
 ---
 
@@ -63,14 +61,43 @@ npm run dev  # http://localhost:3000
 
 ```
 .
-├── components/    # UI コンポーネント
-├── hooks/         # useCountdown, useWordPair など
-├── pages/
-│   ├── index.tsx   # スタート画面（温泉卵＋Start ボタン）
-│   ├── session.tsx # ブレスト進行画面
-│   └── result.tsx  # Markdown / PNG 出力画面
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── page.tsx           # スタート画面（時間モード選択）
+│   │   ├── session/page.tsx   # ブレスト進行画面
+│   │   └── result/page.tsx    # Markdown 出力画面
+│   ├── hooks/
+│   │   └── useCountdown.ts    # カウントダウンタイマー
+│   └── utils/
+│       ├── wordPair.ts        # テーマ×単語ペア生成
+│       └── markdown.ts        # Markdown 出力機能
 ├── data/
-│   └── words.json  # 日本語名詞 300+ 語
+│   ├── themes.json            # ビジネステーマ 101種類
+│   └── words.json             # 日本語名詞 354語
 └── public/
-    └── mascot.png  # 温泉卵の画像アセット
+    └── onsen-tamago.png       # 温泉卵の画像アセット
 ```
+
+## 🎯 使い方
+
+1. **スタート画面** で時間モード（1分・3分・5分）を選択
+2. **セッション画面** で表示されるテーマ×単語ペアを見てアイデアを入力
+3. **Shift+Enter** で送信、**Enter** で改行、**スキップ** で次のペアへ
+4. **結果画面** で入力したアイデアを確認、Markdown形式でコピー
+
+## 🔧 主要機能の詳細
+
+### テーマ×単語ペア生成
+- **101種類のビジネステーマ** × **354個の日本語名詞** = **35,754通り**の組み合わせ
+- 重複なしのランダム生成
+- マーケティング、DX、人事、業務効率化など幅広いテーマをカバー
+
+### 時間モード
+- **1分モード**: クイック発想、短時間集中
+- **3分モード**: 適度な発想時間、バランス重視  
+- **5分モード**: じっくり考える、従来の標準モード
+
+### 結果出力
+- **Markdown形式**: テーブル形式で整理された結果
+- **統計情報**: 出現テーマ・単語の分析、平均回答時間
+- **ワンクリックコピー**: クリップボードに即座にコピー
