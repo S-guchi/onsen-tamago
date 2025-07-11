@@ -1,4 +1,4 @@
-import wordsData from "@/data/words.json";
+import wordsData from "../../data/words.json";
 
 export interface WordPair {
   word1: string;
