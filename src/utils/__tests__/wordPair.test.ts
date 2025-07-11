@@ -1,18 +1,19 @@
-import { WordPairGenerator } from "../wordPair";
+import { ThemeWordPairGenerator } from "../wordPair";
 
-describe("WordPairGenerator", () => {
-  let generator: WordPairGenerator;
+describe("ThemeWordPairGenerator", () => {
+  let generator: ThemeWordPairGenerator;
 
   beforeEach(() => {
-    generator = new WordPairGenerator();
+    generator = new ThemeWordPairGenerator();
   });
 
-  test("should generate a valid word pair", () => {
+  test("should generate a valid theme-word pair", () => {
     const pair = generator.getRandomPair();
     expect(pair).not.toBeNull();
-    expect(pair?.word1).toBeDefined();
-    expect(pair?.word2).toBeDefined();
-    expect(pair?.word1).not.toBe(pair?.word2);
+    expect(pair?.theme).toBeDefined();
+    expect(pair?.word).toBeDefined();
+    expect(typeof pair?.theme).toBe('string');
+    expect(typeof pair?.word).toBe('string');
   });
 
   test("should generate non-duplicate pairs", () => {
@@ -22,7 +23,7 @@ describe("WordPairGenerator", () => {
     for (let i = 0; i < 50; i++) {
       const pair = generator.getRandomPair();
       if (pair) {
-        const pairKey = [pair.word1, pair.word2].sort().join("|");
+        const pairKey = `${pair.theme}|${pair.word}`;
         expect(pairs.has(pairKey)).toBe(false);
         pairs.add(pairKey);
       }

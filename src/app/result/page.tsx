@@ -6,7 +6,8 @@ import { buildMarkdown } from "@/utils/markdown";
 import html2canvas from "html2canvas";
 
 interface Response {
-  wordPair: [string, string];
+  theme: string;
+  word: string;
   userInput: string;
   timestamp: number;
 }
@@ -131,7 +132,7 @@ export default function ResultPage() {
               {responses.map((response, index) => (
                 <div key={index} className="border-l-4 border-orange-300 pl-4">
                   <div className="text-sm text-gray-600 mb-1">
-                    {index + 1}. {response.wordPair[0]} × {response.wordPair[1]}
+                    {index + 1}. {response.theme} × {response.word}
                   </div>
                   <div className="text-gray-800 font-medium">
                     {response.userInput}

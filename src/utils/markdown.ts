@@ -1,5 +1,6 @@
 interface Response {
-  wordPair: [string, string];
+  theme: string;
+  word: string;
   userInput: string;
   timestamp: number;
 }
@@ -23,26 +24,34 @@ export function buildMarkdown(responses: Response[]): string {
   }
 
   markdown += `## アイデア一覧\n\n`;
-  markdown += `| No. | 単語ペア | アイデア |\n`;
-  markdown += `|-----|----------|----------|\n`;
+  markdown += `| No. | テーマ × 単語 | アイデア |\n`;
+  markdown += `|-----|-------------|----------|\n`;
 
   responses.forEach((response, index) => {
-    const wordPair = `${response.wordPair[0]} × ${response.wordPair[1]}`;
+    const themePair = `${response.theme} × ${response.word}`;
     const idea = response.userInput.replace(/\|/g, '\\|').replace(/\n/g, '<br>');
-    markdown += `| ${index + 1} | ${wordPair} | ${idea} |\n`;
+    markdown += `| ${index + 1} | ${themePair} | ${idea} |\n`;
   });
 
   markdown += `\n## 統計\n\n`;
-  markdown += `- 表示された単語ペア数: ${responses.length}\n`;
+  markdown += `- 表示されたテーマ×単語ペア数: ${responses.length}\n`;
   markdown += `- 平均回答時間: 約${Math.round(300 / responses.length)}秒/回答\n`;
   
-  // 最も多く使われた単語を分析
+  // 最も多く使われたテーマ・単語を分析
+  const themeCount = new Map<string, number>();
   const wordCount = new Map<string, number>();
   responses.forEach(response => {
-    response.wordPair.forEach(word => {
-      wordCount.set(word, (wordCount.get(word) || 0) + 1);
-    });
+    themeCount.set(response.theme, (themeCount.get(response.theme) || 0) + 1);
+    wordCount.set(response.word, (wordCount.get(response.word) || 0) + 1);
   });
+  
+  if (themeCount.size > 0) {
+    const sortedThemes = Array.from(themeCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+    
+    markdown += `- よく出現したテーマ: ${sortedThemes.map(([theme, count]) => `${theme}(${count}回)`).join(', ')}\n`;
+  }
   
   if (wordCount.size > 0) {
     const sortedWords = Array.from(wordCount.entries())

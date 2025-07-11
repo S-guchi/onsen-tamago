@@ -4,28 +4,29 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCountdown } from "@/hooks/useCountdown";
-import { wordPairGenerator } from "@/utils/wordPair";
+import { themeWordPairGenerator } from "@/utils/wordPair";
 
 interface Response {
-  wordPair: [string, string];
+  theme: string;
+  word: string;
   userInput: string;
   timestamp: number;
 }
 
 export default function SessionPage() {
   const [userInput, setUserInput] = useState("");
-  const [currentPair, setCurrentPair] = useState<[string, string]>(["読み込み中", "..."]);
+  const [currentPair, setCurrentPair] = useState<{theme: string, word: string}>({theme: "読み込み中", word: "..."});
   const [pairCount, setPairCount] = useState(0);
   const [responses, setResponses] = useState<Response[]>([]);
   const { timeLeft, isFinished, start, formatTime } = useCountdown(300);
   const router = useRouter();
 
-  // 次の単語ペアを生成
+  // 次のテーマ×単語ペアを生成
   const generateNextPair = () => {
-    const pair = wordPairGenerator.getRandomPair();
+    const pair = themeWordPairGenerator.getRandomPair();
     if (pair) {
-      setCurrentPair([pair.word1, pair.word2]);
-      setPairCount(wordPairGenerator.getUsedPairsCount());
+      setCurrentPair({theme: pair.theme, word: pair.word});
+      setPairCount(themeWordPairGenerator.getUsedPairsCount());
     }
   };
 
@@ -59,13 +60,14 @@ export default function SessionPage() {
     if (userInput.trim()) {
       // レスポンスを保存
       const newResponse: Response = {
-        wordPair: currentPair,
+        theme: currentPair.theme,
+        word: currentPair.word,
         userInput: userInput.trim(),
         timestamp: Date.now()
       };
       setResponses(prev => [...prev, newResponse]);
       
-      console.log("入力:", userInput, "ペア:", currentPair);
+      console.log("入力:", userInput, "テーマ:", currentPair.theme, "単語:", currentPair.word);
       setUserInput("");
       // 手動で送信した場合は即座に次のペアを表示
       generateNextPair();
@@ -112,10 +114,10 @@ export default function SessionPage() {
                 <div className="absolute -top-2 left-6 w-4 h-4 bg-orange-100 transform rotate-45"></div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-orange-900 mb-2">
-                    この2つの言葉で何を思い浮かべる？
+                    このテーマと単語で何を思い浮かべる？
                   </div>
                   <div className="text-2xl font-bold text-orange-700">
-                    {currentPair[0]} × {currentPair[1]}
+                    {currentPair.theme} × {currentPair.word}
                   </div>
                 </div>
               </div>
@@ -178,7 +180,7 @@ export default function SessionPage() {
           <div className="mt-4 bg-white/50 rounded-lg p-4 max-w-md mx-auto">
             <h3 className="text-sm font-bold text-gray-700 mb-2">最新の回答:</h3>
             <div className="text-xs text-gray-600">
-              <div>「{responses[responses.length - 1].wordPair[0]} × {responses[responses.length - 1].wordPair[1]}」</div>
+              <div>「{responses[responses.length - 1].theme} × {responses[responses.length - 1].word}」</div>
               <div className="mt-1 font-semibold">→ {responses[responses.length - 1].userInput}</div>
             </div>
           </div>

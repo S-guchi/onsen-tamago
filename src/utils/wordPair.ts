@@ -1,43 +1,40 @@
 import wordsData from "../../data/words.json";
+import themesData from "../../data/themes.json";
 
-export interface WordPair {
-  word1: string;
-  word2: string;
+export interface ThemeWordPair {
+  theme: string;
+  word: string;
 }
 
-export class WordPairGenerator {
+export class ThemeWordPairGenerator {
   private words: string[];
+  private themes: string[];
   private usedPairs: Set<string> = new Set();
 
   constructor() {
     this.words = wordsData as string[];
+    this.themes = themesData as string[];
   }
 
-  private createPairKey(word1: string, word2: string): string {
-    // 順序に関係なく同じペアを識別するため、アルファベット順でソート
-    return [word1, word2].sort().join("|");
+  private createPairKey(theme: string, word: string): string {
+    return `${theme}|${word}`;
   }
 
-  getRandomPair(): WordPair | null {
+  getRandomPair(): ThemeWordPair | null {
     const maxAttempts = 100;
     let attempts = 0;
 
     while (attempts < maxAttempts) {
-      const index1 = Math.floor(Math.random() * this.words.length);
-      let index2 = Math.floor(Math.random() * this.words.length);
+      const themeIndex = Math.floor(Math.random() * this.themes.length);
+      const wordIndex = Math.floor(Math.random() * this.words.length);
       
-      // 同じ単語を避ける
-      if (index1 === index2) {
-        index2 = (index2 + 1) % this.words.length;
-      }
-
-      const word1 = this.words[index1];
-      const word2 = this.words[index2];
-      const pairKey = this.createPairKey(word1, word2);
+      const theme = this.themes[themeIndex];
+      const word = this.words[wordIndex];
+      const pairKey = this.createPairKey(theme, word);
 
       if (!this.usedPairs.has(pairKey)) {
         this.usedPairs.add(pairKey);
-        return { word1, word2 };
+        return { theme, word };
       }
 
       attempts++;
@@ -57,4 +54,4 @@ export class WordPairGenerator {
 }
 
 // シングルトンインスタンス
-export const wordPairGenerator = new WordPairGenerator();
+export const themeWordPairGenerator = new ThemeWordPairGenerator();
