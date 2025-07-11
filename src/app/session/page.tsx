@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCountdown } from "@/hooks/useCountdown";
 
 export default function SessionPage() {
   const [userInput, setUserInput] = useState("");
-  const [timeLeft, setTimeLeft] = useState(300); // 5分 = 300秒
   const [currentPair, setCurrentPair] = useState(["単語1", "単語2"]);
+  const { timeLeft, isActive, isFinished, start, formatTime } = useCountdown(300);
+  const router = useRouter();
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
+  // セッション開始時に自動でタイマーを開始
+  useEffect(() => {
+    start();
+  }, [start]);
+
+  // タイマー完了時にresultページに遷移
+  useEffect(() => {
+    if (isFinished) {
+      router.push("/result");
+    }
+  }, [isFinished, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +45,7 @@ export default function SessionPage() {
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-full px-6 py-3 shadow-lg">
             <div className="text-2xl font-bold text-orange-900">
-              残り時間: {formatTime(timeLeft)}
+              残り時間: {formatTime()}
             </div>
           </div>
         </div>
