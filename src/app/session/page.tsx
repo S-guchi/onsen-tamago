@@ -155,9 +155,12 @@ function SessionPageContent() {
                       if (e.key === 'Enter' && e.shiftKey) {
                         e.preventDefault();
                         handleSubmit(e);
+                      } else if (e.key === 'Enter' && !e.shiftKey && userInput.trim() === '') {
+                        e.preventDefault();
+                        handleSkip();
                       }
                     }}
-                    placeholder="アイデアを入力... (Shift+Enter で送信、Enter で改行)"
+                    placeholder="アイデアを入力... (Shift+Enter で送信、Enter で改行、入力なしでEnter でスキップ)"
                     className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg"
                     autoFocus
                   />
@@ -175,7 +178,7 @@ function SessionPageContent() {
                     onClick={handleSkip}
                     className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
                   >
-                    スキップ
+                    スキップ (Enter)
                   </button>
                 </div>
               </form>
