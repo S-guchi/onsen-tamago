@@ -35,7 +35,7 @@ export default function Home() {
         <div className="flex flex-col gap-4 items-center">
           <h2 className="text-xl font-bold text-orange-900 mb-2">時間を選択してください</h2>
           
-          <div className="flex gap-4">
+          <div className="grid grid-cols-2 gap-4 max-w-md">
             <button
               onClick={() => handleStart(1)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
@@ -55,6 +55,13 @@ export default function Home() {
               className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               5分モード
+            </button>
+            
+            <button
+              onClick={() => handleStart(10)}
+              className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              10分モード
             </button>
           </div>
         </div>
