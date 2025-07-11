@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { buildMarkdown } from "@/utils/markdown";
+import html2canvas from "html2canvas";
 
 interface Response {
   wordPair: [string, string];
@@ -15,6 +16,8 @@ export default function ResultPage() {
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const captureRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -61,6 +64,38 @@ export default function ResultPage() {
     }
   };
 
+  const handleCapturePNG = async () => {
+    if (!captureRef.current) return;
+    
+    setIsCapturing(true);
+    try {
+      const canvas = await html2canvas(captureRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      // canvasをBlob形式に変換
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `温泉卵ブレスト結果_${new Date().toISOString().split('T')[0]}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png');
+    } catch (error) {
+      console.error('PNG出力に失敗しました:', error);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-orange-50 to-orange-100">
@@ -73,7 +108,7 @@ export default function ResultPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto" ref={captureRef}>
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-orange-900 mb-4">
             🎉 お疲れ様でした！
@@ -127,9 +162,10 @@ export default function ResultPage() {
             </button>
             <button
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
-              onClick={() => {/* TODO: PNG出力機能 */}}
+              onClick={handleCapturePNG}
+              disabled={isCapturing}
             >
-              📸 PNG出力
+              {isCapturing ? '📸 出力中...' : '📸 PNG出力'}
             </button>
           </div>
         </div>
