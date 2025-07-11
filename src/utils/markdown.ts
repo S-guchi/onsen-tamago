@@ -5,7 +5,7 @@ interface Response {
   timestamp: number;
 }
 
-export function buildMarkdown(responses: Response[]): string {
+export function buildMarkdown(responses: Response[], sessionMinutes: number = 5): string {
   const date = new Date();
   const dateString = date.toLocaleDateString('ja-JP', {
     year: 'numeric',
@@ -15,7 +15,7 @@ export function buildMarkdown(responses: Response[]): string {
 
   let markdown = `# 温泉卵ブレスト結果\n\n`;
   markdown += `**実施日時:** ${dateString}\n`;
-  markdown += `**セッション時間:** 5分\n`;
+  markdown += `**セッション時間:** ${sessionMinutes}分\n`;
   markdown += `**回答数:** ${responses.length}件\n\n`;
   
   if (responses.length === 0) {
@@ -35,7 +35,7 @@ export function buildMarkdown(responses: Response[]): string {
 
   markdown += `\n## 統計\n\n`;
   markdown += `- 表示されたテーマ×単語ペア数: ${responses.length}\n`;
-  markdown += `- 平均回答時間: 約${Math.round(300 / responses.length)}秒/回答\n`;
+  markdown += `- 平均回答時間: 約${Math.round((sessionMinutes * 60) / responses.length)}秒/回答\n`;
   
   // 最も多く使われたテーマ・単語を分析
   const themeCount = new Map<string, number>();

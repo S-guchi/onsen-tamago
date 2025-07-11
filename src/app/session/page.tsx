@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCountdown } from "@/hooks/useCountdown";
 import { themeWordPairGenerator } from "@/utils/wordPair";
 
@@ -18,8 +18,11 @@ export default function SessionPage() {
   const [currentPair, setCurrentPair] = useState<{theme: string, word: string}>({theme: "読み込み中", word: "..."});
   const [pairCount, setPairCount] = useState(0);
   const [responses, setResponses] = useState<Response[]>([]);
-  const { timeLeft, isFinished, start, formatTime } = useCountdown(300);
+  const [sessionMinutes, setSessionMinutes] = useState(5);
+  const [sessionSeconds, setSessionSeconds] = useState(300);
+  const { timeLeft, isFinished, start, formatTime } = useCountdown(sessionSeconds);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // 次のテーマ×単語ペアを生成
   const generateNextPair = () => {
@@ -30,24 +33,36 @@ export default function SessionPage() {
     }
   };
 
-  // 初回ロード時に最初のペアを生成
+  // 初回ロード時に時間パラメータを取得してセッション設定
   useEffect(() => {
+    const minutesParam = searchParams.get('minutes');
+    const minutes = minutesParam ? parseInt(minutesParam) : 5;
+    const seconds = minutes * 60;
+    
+    setSessionMinutes(minutes);
+    setSessionSeconds(seconds);
     generateNextPair();
-  }, []);
+  }, [searchParams]);
 
   // セッション開始時に自動でタイマーを開始
   useEffect(() => {
-    start();
-  }, [start]);
+    if (sessionSeconds > 0) {
+      start();
+    }
+  }, [start, sessionSeconds]);
 
   // タイマー完了時にresultページに遷移
   useEffect(() => {
     if (isFinished) {
       // セッション結果をsessionStorageに保存
-      sessionStorage.setItem('brainstormResults', JSON.stringify(responses));
+      const sessionData = {
+        responses,
+        sessionMinutes
+      };
+      sessionStorage.setItem('brainstormResults', JSON.stringify(sessionData));
       router.push("/result");
     }
-  }, [isFinished, router, responses]);
+  }, [isFinished, router, responses, sessionMinutes]);
 
 
   // レスポンス配列の変更をコンソールで確認

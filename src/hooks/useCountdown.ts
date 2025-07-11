@@ -19,6 +19,12 @@ export function useCountdown(initialSeconds: number) {
     setIsFinished(false);
   }, [initialSeconds]);
 
+  // initialSecondsが変更されたときにtimeLeftを更新
+  useEffect(() => {
+    setTimeLeft(initialSeconds);
+    setIsFinished(false);
+  }, [initialSeconds]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 

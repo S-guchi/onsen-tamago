@@ -14,6 +14,7 @@ interface Response {
 
 export default function ResultPage() {
   const [responses, setResponses] = useState<Response[]>([]);
+  const [sessionMinutes, setSessionMinutes] = useState(5);
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -26,9 +27,19 @@ export default function ResultPage() {
     const savedResults = sessionStorage.getItem('brainstormResults');
     if (savedResults) {
       try {
-        const parsedResponses = JSON.parse(savedResults);
-        setResponses(parsedResponses);
-        setMarkdown(buildMarkdown(parsedResponses));
+        const sessionData = JSON.parse(savedResults);
+        // 新しい形式（オブジェクト）と古い形式（配列）の両方に対応
+        if (Array.isArray(sessionData)) {
+          // 古い形式の場合
+          setResponses(sessionData);
+          setSessionMinutes(5); // デフォルト値
+          setMarkdown(buildMarkdown(sessionData, 5));
+        } else {
+          // 新しい形式の場合
+          setResponses(sessionData.responses);
+          setSessionMinutes(sessionData.sessionMinutes);
+          setMarkdown(buildMarkdown(sessionData.responses, sessionData.sessionMinutes));
+        }
       } catch (error) {
         console.error('結果の読み込みに失敗しました:', error);
       }
@@ -115,7 +126,7 @@ export default function ResultPage() {
             🎉 お疲れ様でした！
           </h1>
           <p className="text-lg text-gray-700">
-            5分間のブレインストーミングが完了しました
+            {sessionMinutes}分間のブレインストーミングが完了しました
           </p>
         </div>
 

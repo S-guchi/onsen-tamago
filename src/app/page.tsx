@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
 
-  const handleStart = () => {
-    router.push("/session");
+  const handleStart = (minutes: number) => {
+    // 選択した時間をクエリパラメータで渡す
+    router.push(`/session?minutes=${minutes}`);
   };
 
   return (
@@ -27,16 +28,36 @@ export default function Home() {
         </div>
 
         <p className="text-lg text-gray-700 text-center max-w-md">
-          5分間ノンストップで強制連想法！<br/>
+          強制連想法でアイデア出し！<br/>
           温泉卵がアイデア出しをサポートします
         </p>
 
-        <button
-          onClick={handleStart}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-full text-xl transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          Start
-        </button>
+        <div className="flex flex-col gap-4 items-center">
+          <h2 className="text-xl font-bold text-orange-900 mb-2">時間を選択してください</h2>
+          
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleStart(1)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              1分モード
+            </button>
+            
+            <button
+              onClick={() => handleStart(3)}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              3分モード
+            </button>
+            
+            <button
+              onClick={() => handleStart(5)}
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              5分モード
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   );
